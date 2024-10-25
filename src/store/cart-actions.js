@@ -1,5 +1,6 @@
 import { uiActions } from "./ui-slice";
 import { cartActions } from "./cart-slice";
+// import CartItem from "../components/Cart/CartItem";
 
 export const fetchCartData = () => {
   return async (dispatch) => {
@@ -16,8 +17,12 @@ export const fetchCartData = () => {
     };
     try {
       const cartData = await fetchData();
-        dispatch(
-            cartActions.replaceCart(cartData))
+      dispatch(
+        cartActions.replaceCart({
+          items: cartData.items || [],
+          totalQuantity: cartData.totalQuantity,
+        })  
+      );
     } catch (error) {
       dispatch(
         await uiActions.showNotification({
@@ -44,7 +49,10 @@ export const sendCartData = (cart) => {
         "https://redux-http-83a00-default-rtdb.europe-west1.firebasedatabase.app/cart.json",
         {
           method: "PUT", // PUT is used to overwrite the existing data in the database with the new data that we are sending
-          body: JSON.stringify(cart),
+          body: JSON.stringify({
+            items: cart.items,
+            totalQuantity: cart.totalQuantity,
+          }),
         }
       );
       if (!response.ok) {
